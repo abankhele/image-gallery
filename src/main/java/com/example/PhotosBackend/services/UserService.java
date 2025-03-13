@@ -6,6 +6,7 @@ import com.example.PhotosBackend.repository.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +15,8 @@ import java.util.List;
 public class UserService {
     @Autowired
     private UsersRepo repo;
-    @Autowired
-    private PasswordService passwordService;
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
     public List<Users> getUsers() {
         return repo.findAll();
@@ -27,7 +28,7 @@ public class UserService {
             throw new RuntimeException("Name and Password cannot be empty.");
         }
         try {
-            user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()));
+            user.setPasswordHash(encoder.encode(user.getPasswordHash()));
             return repo.save(user);
         } catch (DuplicateKeyException e) {
             throw new RuntimeException("Email already exists.");

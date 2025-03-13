@@ -4,18 +4,17 @@ import com.example.PhotosBackend.model.Users;
 import com.example.PhotosBackend.services.UserService;
 
 
-import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/photos")
 class UserController {
     @Autowired
     private UserService service;
@@ -26,8 +25,8 @@ class UserController {
         return service.getUsers();
     }
 
-    @PostMapping("/user")
-    public ResponseEntity<Object> addUser(@Valid @RequestBody Users users){
+    @PostMapping("/register")
+    public ResponseEntity<Object> addUser(@RequestBody Users users){
 
         try {
             System.out.println(users);
