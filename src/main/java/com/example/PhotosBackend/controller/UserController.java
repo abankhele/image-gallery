@@ -1,6 +1,7 @@
 package com.example.PhotosBackend.controller;
 
 import com.example.PhotosBackend.model.Users;
+import com.example.PhotosBackend.services.JwtService;
 import com.example.PhotosBackend.services.UserService;
 
 
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,6 +20,12 @@ import java.util.List;
 
 @RestController
 class UserController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtservice;
     @Autowired
     private UserService service;
 
@@ -36,6 +46,17 @@ class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Users user){
+        Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPasswordHash()));
+        if(authentication.isAuthenticated()){
+            return jwtservice.generateToken(user.getEmail());
+        }
+        else{
+            return "Failure";
+        }
     }
 
 }
