@@ -1,4 +1,4 @@
-package com.example.PhotosBackend.repository;
+package com.example.PhotosBackend.model;
 
 import com.example.PhotosBackend.model.Users;
 import org.springframework.security.core.GrantedAuthority;

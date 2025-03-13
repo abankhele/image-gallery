@@ -1,7 +1,7 @@
 package com.example.PhotosBackend.services;
 
 import com.example.PhotosBackend.model.Users;
-import com.example.PhotosBackend.repository.UserPrincipal;
+import com.example.PhotosBackend.model.UserPrincipal;
 import com.example.PhotosBackend.repository.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,4 +1,4 @@
-package config;
+package com.example.PhotosBackend.config;
 
 import com.example.PhotosBackend.services.JwtService;
 import com.example.PhotosBackend.services.MyUserDetailsService;
