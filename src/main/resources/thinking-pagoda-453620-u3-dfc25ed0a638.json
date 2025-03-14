@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "thinking-pagoda-453620-u3",
+  "private_key_id": "dfc25ed0a638438d053d1b88de7413606d2ab675",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC3CpKVvWjr1Z0Z\nHGGwXgxV6R7NidTnz22NNoE5JOQZ4DJSkOzINieLpSZdPOpKkykqsekuFTK8FDCe\nq0LVeHv6KzwiPEr1PJF2iEb2fs5bd7jAG/zzCSvcnW8OojO6CVkQBO2km+NhT/rk\n15ATDBOXf5RNNiC73x2Es/jeA8OIWzIMzT/OcHljijnHKP3lZ7kSSKiF6lqGW288\neYUXsjbEeXrhFvqU4L/YinNdVDr9JzYzZOqKExP+A0WgWQBtfccEMTYewG4wAYN+\nZmpkKjWxspt0dGM5bdJLZMhTFaafTp0M5ItpKJVJuDHetHve6bDbCcWLyOOc9UFZ\n8V7TdTVlAgMBAAECggEAQIXLkllIaQnN7RIiJYehlY8tuoqBsI1gMs0p1Dj651wu\noQhRT2o3mnRHB8r3U/54HoLEjegPEFmVofkBADsOiOtAsVjLm5MUO9JiIXYly/xx\n9dZn3kw3V/dvNJtc3JF7AbibBNGm36DP8mdCdFRne5oPbwBLna5Su3qtmaV+Acx6\nGL8yR4mXMe6PnhnNezUsSwAzpU5VqtxaULYBLObzzbi/alMwxGSFz7YbahW9ZL+P\nxG93OminFLyqovQEJF8smzPdX7WLrDz5j/f4UzI7s+ypMsDYCteVSeiSJBimElOG\nh3qxJjczMheTJj3/W660TZuhPTpmHzJ5DKpWQvA6aQKBgQD1BQXq2h56JHsGk3Ql\nQUlMv6MJtON3haAKsBGcPZV4hS9xFfX72tKOSHnmGiRgFuxH4LiP1NmJR/1Uhe4w\nyEp8zf25TbMs5Z5Fo3fwgUqR2DG4yj7aH+ZkxOZtA8wYly4pyFs5PthDF81Epw0n\nsg22my3ALja0k1waGhBIWiOLuwKBgQC/PoGCIsCaNl/VHU51sjT9fF+lXCRDdp1T\nyCFpYosxkucMLNZF2eOHQ0tb3CPqTAMqB2rpdWAtR8RkTvrKDljjkpd6j40Yfd06\nCGRmZHO4b9mzWrB2a46QD3APrv+vYCk3mEwlL/YajXZ4fTWSnFvKEIVbGmDKYSfx\nsS5hb4/hXwKBgQDcZ4VYKpdp1jEYzEGZVa4jLOvzSlWn6Xr6wkFFI5y2SlBP0Kpy\nwPfQ599HntKD4XrweXRsZdK9jBWVF9kY5sMim4YWT4/S3kbOa+rzXMqAgVLQ4JVD\nT5jHotuIyvaoVC5BhaqRxzdwuxN6Iy9ROvjc/6BbFPc+3qPmEvX8r6D0CwKBgQCT\nZMtPzxT+RdYKXHHyCA0LKOZWffN9A1gyEFaf8FEzPfNQ0OW8JDhWMalM/Re5Jihy\nJhFiKRKdE2jrnmtveytLCdoxnZ2zOJ5eccVfnSALEDmLH+RNAIx5v0ww6kEpm0Vp\nEbnuF07oHAsoxeeaPWQJEj6VfnkGwWaVwmbqtZ8ApQKBgQCT+GQleyJpQNHEad9a\n/sxn5UIjMIqj3NeNTxB0H0mL6m9oq+7vofOlNotbQdR31opPryzSxmTni5xAydpd\nBL/NChWUf1UvoMoYEwKhsZAzKeuheP6YTby03xaCx26wjsHVncniy/fphho5t5X4\nix4Z2SgES4GPD0pS5xTsF4xfbQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "bucketadmin@thinking-pagoda-453620-u3.iam.gserviceaccount.com",
+  "client_id": "106857432354836319791",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bucketadmin%40thinking-pagoda-453620-u3.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

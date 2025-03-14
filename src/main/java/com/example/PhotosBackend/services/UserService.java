@@ -24,8 +24,8 @@ public class UserService {
 
     public Users addUser(Users user){
 
-        if (user.getName().isBlank() || user.getPasswordHash().isBlank()) {
-            throw new RuntimeException("Name and Password cannot be empty.");
+        if (user.getName().isBlank() || user.getPasswordHash().isBlank() || user.getEmail().isBlank()) {
+            throw new RuntimeException("Name Email or Password cannot be empty.");
         }
         try {
             user.setPasswordHash(encoder.encode(user.getPasswordHash()));
