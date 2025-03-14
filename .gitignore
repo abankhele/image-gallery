@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+!**/src/main/resources/thinking-pagoda-453620-u3-dfc25ed0a638.json
+!**/src/main/resources/application.properties
