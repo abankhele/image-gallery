@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 public class GCSService {
 
-    Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(""));
+    Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("src/main/resources/thinking-pagoda-453620-u3-e787b1d5f7f9.json"));
 
     private final Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 
