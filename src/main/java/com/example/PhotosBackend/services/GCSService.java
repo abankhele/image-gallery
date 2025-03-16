@@ -1,17 +1,17 @@
 package com.example.PhotosBackend.services;
 
+import com.example.PhotosBackend.model.Photo;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,5 +36,28 @@ public class GCSService {
         return blob.getMediaLink();
     }
 
+    public Photo uploadFiles(MultipartFile file, String userId, String albumId, List<String> tags) throws IOException {
+        String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+
+        Bucket bucket = storage.get(bucketName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, fileName)
+                .setContentType(file.getContentType())
+                .build();
+
+        // Enable Resumable Uploads for Large Files
+        storage.create(blobInfo, file.getInputStream());
+
+        // Creating a Photo Object with Metadata
+        Photo photo = new Photo();
+        photo.setUserId(userId);
+        photo.setAlbumId(albumId);
+        photo.setGcsUrl(String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName));
+        photo.setTags(tags);
+        photo.setSize(file.getSize());
+        photo.setFormat(file.getContentType());
+        photo.setUploadedOn(new Date());
+
+        return photo;
+    }
 
 }

@@ -17,4 +17,12 @@ public class PhotoService {
     public Photo savePhoto(Photo photo) {
         return photoRepository.save(photo);
     }
+
+    public Object saveAllPhotos(List<Photo> uploadedPhotos) {
+        return photoRepository.saveAll(uploadedPhotos);
+    }
+
+    public List<Photo> getPhotosByUserId(String userId) {
+        return photoRepository.findByUserId(userId);
+    }
 }
