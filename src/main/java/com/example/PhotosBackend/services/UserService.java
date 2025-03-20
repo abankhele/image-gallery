@@ -6,6 +6,7 @@ import com.example.PhotosBackend.repository.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,10 @@ public class UserService {
 
     public List<Users> getUsers() {
         return repo.findAll();
+    }
+
+    public Users getUserByEmail(String email) {
+        return repo.findByEmail(email);
     }
 
     public Users addUser(Users user){

@@ -1,63 +1,96 @@
 package com.example.PhotosBackend.services;
 
-import com.example.PhotosBackend.model.Photo;
-import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class GCSService {
 
-    Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("src/main/resources/thinking-pagoda-453620-u3-e787b1d5f7f9.json"));
-
-    private final Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-
     @Value("${gcp.storage.bucket}")
     private String bucketName;
 
-    public GCSService() throws IOException {
+    private Storage storage;
+
+    @PostConstruct
+    public void initialize() throws IOException {
+        // Load credentials from the JSON key file
+        GoogleCredentials credentials = GoogleCredentials.fromStream(
+                new FileInputStream("src/main/resources/thinking-pagoda-453620-u3-e787b1d5f7f9.json"));
+
+        // Initialize storage with credentials
+        this.storage = StorageOptions.newBuilder()
+                .setCredentials(credentials)
+                .build()
+                .getService();
     }
 
-    public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
-        Bucket bucket = storage.get(bucketName);
-        Blob blob = bucket.create(fileName, file.getBytes(), file.getContentType());
+    public String uploadFile(MultipartFile file, String userId) throws IOException {
+        // Generate a unique filename
+        String originalFilename = file.getOriginalFilename();
+        String uniqueFilename = UUID.randomUUID().toString() + "-" + originalFilename;
 
-        return blob.getMediaLink();
-    }
-
-    public Photo uploadFiles(MultipartFile file, String userId, String albumId, List<String> tags) throws IOException {
-        String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
-
-        Bucket bucket = storage.get(bucketName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, fileName)
+        // Create blob info
+        BlobId blobId = BlobId.of(bucketName, uniqueFilename);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(file.getContentType())
                 .build();
 
-        // Enable Resumable Uploads for Large Files
-        storage.create(blobInfo, file.getInputStream());
+        // Upload the file
+        Blob blob = storage.create(blobInfo, file.getBytes());
 
-        // Creating a Photo Object with Metadata
-        Photo photo = new Photo();
-        photo.setUserId(userId);
-        photo.setAlbumId(albumId);
-        photo.setGcsUrl(String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName));
-        photo.setTags(tags);
-        photo.setSize(file.getSize());
-        photo.setFormat(file.getContentType());
-        photo.setUploadedOn(new Date());
-
-        return photo;
+        // Return the public URL
+        return blob.getMediaLink();
     }
 
+    public byte[] downloadFile(String gcsUrl) {
+        // Extract the object name from the GCS URL
+        String objectName = extractObjectNameFromUrl(gcsUrl);
+
+        Blob blob = storage.get(BlobId.of(bucketName, objectName));
+        if (blob == null) {
+            throw new IllegalArgumentException("File not found: " + objectName);
+        }
+        return blob.getContent();
+    }
+
+    public void deleteFile(String gcsUrl) {
+        // Extract the object name from the GCS URL
+        String objectName = extractObjectNameFromUrl(gcsUrl);
+
+        storage.delete(BlobId.of(bucketName, objectName));
+    }
+
+    private String extractObjectNameFromUrl(String gcsUrl) {
+        // This is a simplified example - you may need to adjust based on your actual URL format
+        // Example URL: https://storage.googleapis.com/download/storage/v1/b/bucket-name/o/filename.jpg?generation=123&alt=media
+
+        // Extract the filename from the URL
+        int startIndex = gcsUrl.indexOf("/o/") + 3;
+        int endIndex = gcsUrl.indexOf("?", startIndex);
+
+        if (startIndex < 3 || endIndex < 0) {
+            throw new IllegalArgumentException("Invalid GCS URL format: " + gcsUrl);
+        }
+
+        return gcsUrl.substring(startIndex, endIndex);
+    }
+
+    public boolean fileExists(String gcsUrl) {
+        try {
+            String objectName = extractObjectNameFromUrl(gcsUrl);
+            return storage.get(BlobId.of(bucketName, objectName)) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

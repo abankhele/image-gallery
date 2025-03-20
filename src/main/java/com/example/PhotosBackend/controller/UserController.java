@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/photos")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5173")
 class UserController {
 
@@ -57,10 +57,11 @@ class UserController {
                 new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPasswordHash())
         );
         if(authentication.isAuthenticated()){
+            Users authenticatedUser = service.getUserByEmail(user.getEmail());
             String token = jwtservice.generateToken(user.getEmail());
             return ResponseEntity.ok().body(Map.of(
                     "token", token,
-                    "user", Map.of("email", user.getEmail())
+                    "user", Map.of("id", user.getEmail())
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(

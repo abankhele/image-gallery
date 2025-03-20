@@ -1,140 +1,71 @@
 package com.example.PhotosBackend.controller;
 
 import com.example.PhotosBackend.model.Photo;
-import com.example.PhotosBackend.services.GCSService;
 import com.example.PhotosBackend.services.PhotoService;
-import com.google.auth.Credentials;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Storage;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+
 @RestController
-@RequestMapping("/api/photo")
+@RequestMapping("/api/photos")
 @CrossOrigin(origins = "http://localhost:5173")
 public class PhotoController {
-    @Autowired
-    private GCSService gcsService;
+
+    private final PhotoService photoService;
 
     @Autowired
-    private PhotoService photoService;
-
-    public PhotoController() throws IOException {
-    }
-
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadPhoto(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("userId") String userId,
-            @RequestParam("albumId") String albumId,
-            @RequestParam(value = "tags", required = false) String tags
-    ) {
-        try {
-
-            String gcsUrl = gcsService.uploadFile(file);
-
-            long size1 = file.getSize();  // Get file size in bytes
-            String format1 = file.getContentType();
-
-            // Create a new photo object with the metadata and GCS URL
-            Photo photo = new Photo();
-            photo.setUserId(userId);
-            photo.setAlbumId(albumId);
-            photo.setGcsUrl(gcsUrl);
-            photo.setTags(List.of(tags.split(",")));   // Convert comma-separated tags to a list
-            photo.setSize(size1);
-            photo.setFormat(format1);
-
-            // Save the photo metadata to MongoDB
-            photo = photoService.savePhoto(photo);
-
-            return ResponseEntity.ok(photo);  // Return the photo object as the response
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/batch-upload")
-    public ResponseEntity<?> batchUploadPhotos(
-            @RequestParam("files") List<MultipartFile> files,
-            @RequestParam("userId") String userId,
-            @RequestParam("albumId") String albumId,
-            @RequestParam(value = "tags", required = false) String tags
-    ) {
-        List<String> tagList = tags != null ? List.of(tags.split(",")) : List.of();
-
-        List<CompletableFuture<Photo>> futures = files.stream()
-                .map(file -> CompletableFuture.supplyAsync(() -> {
-                    try {
-                        return gcsService.uploadFiles(file, userId, albumId, tagList);
-                    } catch (Exception e) {
-                        throw new RuntimeException("Upload failed: " + e.getMessage());
-                    }
-                }))
-                .collect(Collectors.toList());
-
-        List<Photo> uploadedPhotos = futures.stream()
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(photoService.saveAllPhotos(uploadedPhotos));
+    public PhotoController(PhotoService photoService) {
+        this.photoService = photoService;
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Photo>> getUserPhotos(@PathVariable String userId){
-        List<Photo> photos = photoService.getPhotosByUserId(userId);
-
-        if(photos.isEmpty()){
-                return ResponseEntity.noContent().build();
-        }else{
-            return ResponseEntity.ok(photos);
-        }
-
-
-
+    public ResponseEntity<List<Photo>> getAllUserPhotos(@PathVariable String userId) {
+        List<Photo> photos = photoService.getAllPhotosByUserId(userId);
+        return ResponseEntity.ok(photos);
     }
 
-    Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("src/main/resources/thinking-pagoda-453620-u3-e787b1d5f7f9.json"));
-
-    private final Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-
-    @Value("${gcp.storage.bucket}")
-    private String bucketName;
-
-
-    @GetMapping("/{fileName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String fileName) throws IOException {
-        Blob blob = storage.get(bucketName, fileName);
-        if (blob == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(blob.getContent());
+    @GetMapping("/{photoId}")
+    public ResponseEntity<Photo> getPhotoById(@PathVariable String photoId) {
+        Photo photo = photoService.getPhotoById(photoId);
+        return ResponseEntity.ok(photo);
     }
 
+    @GetMapping("/album/{albumId}")
+    public ResponseEntity<List<Photo>> getPhotosByAlbumId(@PathVariable String albumId) {
+        List<Photo> photos = photoService.getPhotosByAlbumId(albumId);
+        return ResponseEntity.ok(photos);
+    }
 
+    @GetMapping("/user/{userId}/tag/{tag}")
+    public ResponseEntity<List<Photo>> getPhotosByUserIdAndTag(
+            @PathVariable String userId,
+            @PathVariable String tag) {
+        List<Photo> photos = photoService.getPhotosByUserIdAndTag(userId, tag);
+        return ResponseEntity.ok(photos);
+    }
 
+    @PostMapping
+    public ResponseEntity<Photo> uploadPhoto(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("userId") String userId,
+            @RequestParam(value = "albumId", required = false) String albumId,
+            @RequestParam(value = "tags", required = false) List<String> tags) {
+        try {
+            Photo photo = photoService.uploadPhoto(file, userId, albumId, tags);
+            return ResponseEntity.ok(photo);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
+    @DeleteMapping("/{photoId}")
+    public ResponseEntity<Void> deletePhoto(@PathVariable String photoId) {
+        photoService.deletePhoto(photoId);
+        return ResponseEntity.noContent().build();
+    }
 }
-
-
-
-
