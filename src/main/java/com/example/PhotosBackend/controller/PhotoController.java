@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/api/photo")
+@CrossOrigin(origins = "http://localhost:5173")
 public class PhotoController {
     @Autowired
     private GCSService gcsService;

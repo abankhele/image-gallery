@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/photos")
+@CrossOrigin(origins = "http://localhost:5173")
 class UserController {
 
     @Autowired
@@ -50,14 +52,22 @@ class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Users user){
-        Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPasswordHash()));
+    public ResponseEntity<Object> login(@RequestBody Users user){
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPasswordHash())
+        );
         if(authentication.isAuthenticated()){
-            return jwtservice.generateToken(user.getEmail());
-        }
-        else{
-            return "Failure";
+            String token = jwtservice.generateToken(user.getEmail());
+            return ResponseEntity.ok().body(Map.of(
+                    "token", token,
+                    "user", Map.of("email", user.getEmail())
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "message", "Authentication failed"
+            ));
         }
     }
+
 
 }
