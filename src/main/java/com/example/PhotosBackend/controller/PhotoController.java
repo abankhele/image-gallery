@@ -1,12 +1,17 @@
 package com.example.PhotosBackend.controller;
 
 import com.example.PhotosBackend.model.Photo;
+import com.example.PhotosBackend.services.GCSService;
 import com.example.PhotosBackend.services.PhotoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import org.springframework.http.CacheControl;
+import java.util.concurrent.TimeUnit;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +21,10 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class PhotoController {
 
+    @Autowired
     private final PhotoService photoService;
+    @Autowired
+    private GCSService storageservice;
 
     @Autowired
     public PhotoController(PhotoService photoService) {
@@ -24,15 +32,32 @@ public class PhotoController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Photo>> getAllUserPhotos(@PathVariable String userId) {
-        List<Photo> photos = photoService.getAllPhotosByUserId(userId);
+    public ResponseEntity<List<Photo>> getAllUserPhotos(
+            @PathVariable String userId,
+            HttpServletRequest request) {
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        List<Photo> photos = photoService.getAllPhotosByUserIdWithDisplayUrls(userId, baseUrl);
         return ResponseEntity.ok(photos);
     }
+
 
     @GetMapping("/{photoId}")
     public ResponseEntity<Photo> getPhotoById(@PathVariable String photoId) {
         Photo photo = photoService.getPhotoById(photoId);
         return ResponseEntity.ok(photo);
+    }
+    @GetMapping("/image/{photoId}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String photoId) {
+        try {
+            Photo photo = photoService.getPhotoById(photoId);
+            byte[] imageBytes = storageservice.downloadFile(photo.getGcsUrl());
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(photo.getFormat()))
+                    .body(imageBytes);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/album/{albumId}")

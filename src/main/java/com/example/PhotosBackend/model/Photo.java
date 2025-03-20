@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.stereotype.Component;
 
+import org.springframework.data.annotation.Transient;
+
 import java.util.Date;
 import java.util.List;
 
@@ -33,5 +35,8 @@ public class Photo {
     private long size;
 
     private String format;
+
+    @Transient
+    private String displayUrl;
 
 }

@@ -66,4 +66,12 @@ public class PhotoService {
         // Delete from MongoDB
         photoRepository.deleteById(photoId);
     }
+    public List<Photo> getAllPhotosByUserIdWithDisplayUrls(String userId, String baseUrl) {
+        List<Photo> photos = photoRepository.findByUserId(userId);
+        photos.forEach(photo -> {
+            photo.setDisplayUrl(baseUrl + "/api/photos/image/" + photo.getId());
+        });
+        return photos;
+    }
+
 }

@@ -61,7 +61,7 @@ class UserController {
             String token = jwtservice.generateToken(user.getEmail());
             return ResponseEntity.ok().body(Map.of(
                     "token", token,
-                    "user", Map.of("id", user.getEmail())
+                    "user", Map.of("id", authenticatedUser.getId())
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
