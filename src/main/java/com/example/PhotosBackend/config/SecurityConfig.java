@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(customizer -> customizer.disable());
 
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers("api/auth/register", "api/auth/login")
+                        .requestMatchers("api/auth/register", "api/auth/login", "api/photos/image/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

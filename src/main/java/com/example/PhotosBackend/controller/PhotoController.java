@@ -54,8 +54,10 @@ public class PhotoController {
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(photo.getFormat()))
+                    .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS))
                     .body(imageBytes);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }

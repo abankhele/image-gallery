@@ -39,4 +39,8 @@ public class Photo {
     @Transient
     private String displayUrl;
 
+    public void setDisplayUrlFromBaseUrl(String baseUrl) {
+        this.displayUrl = baseUrl + "/api/photos/image/" + this.id;
+    }
+
 }

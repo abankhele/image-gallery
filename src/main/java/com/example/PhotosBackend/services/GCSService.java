@@ -71,18 +71,25 @@ public class GCSService {
     }
 
     private String extractObjectNameFromUrl(String gcsUrl) {
-        // This is a simplified example - you may need to adjust based on your actual URL format
-        // Example URL: https://storage.googleapis.com/download/storage/v1/b/bucket-name/o/filename.jpg?generation=123&alt=media
+        try {
+            // For URLs like: https://storage.googleapis.com/download/storage/v1/b/bucket-name/o/filename.jpg?generation=123&alt=media
+            if (gcsUrl.contains("/o/")) {
+                int startIndex = gcsUrl.indexOf("/o/") + 3;
+                int endIndex = gcsUrl.indexOf("?", startIndex);
 
-        // Extract the filename from the URL
-        int startIndex = gcsUrl.indexOf("/o/") + 3;
-        int endIndex = gcsUrl.indexOf("?", startIndex);
+                if (endIndex < 0) {
+                    endIndex = gcsUrl.length();
+                }
 
-        if (startIndex < 3 || endIndex < 0) {
+                String encodedFileName = gcsUrl.substring(startIndex, endIndex);
+                return java.net.URLDecoder.decode(encodedFileName, "UTF-8");
+            }
+
+            // For direct object names or other URL formats
+            return gcsUrl;
+        } catch (Exception e) {
             throw new IllegalArgumentException("Invalid GCS URL format: " + gcsUrl);
         }
-
-        return gcsUrl.substring(startIndex, endIndex);
     }
 
     public boolean fileExists(String gcsUrl) {
