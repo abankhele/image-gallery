@@ -8,11 +8,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class PhotoService {
+
+    @Autowired
+    private VisionService visionService;
 
     private final PhotoRepository photoRepository;
     private final GCSService storageService;
@@ -44,6 +48,14 @@ public class PhotoService {
         // Upload file to Google Cloud Storage
         String gcsUrl = storageService.uploadFile(file, userId);
 
+        List<String> detectedLabels = visionService.detectLabels(file.getBytes());
+
+        // Combine user-provided tags with detected labels
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
+        tags.addAll(detectedLabels);
+
         // Create and save photo metadata
         Photo photo = new Photo();
         photo.setUserId(userId);
@@ -72,6 +84,14 @@ public class PhotoService {
             photo.setDisplayUrl(baseUrl + "/api/photos/image/" + photo.getId());
         });
         return photos;
+    }
+
+    public List<Photo> searchPhotosByUserIdAndTags(String userId, String query) {
+        return photoRepository.findByUserIdAndTagsContainingIgnoreCase(userId, query);
+    }
+
+    public List<Photo> searchPhotosByTags(String query) {
+        return photoRepository.findByTagsContainingIgnoreCase(query);
     }
 
 }

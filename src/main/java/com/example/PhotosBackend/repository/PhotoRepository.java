@@ -13,4 +13,7 @@ public interface PhotoRepository extends MongoRepository<Photo, String> {
     List<Photo> findByUserId(String userId);
     List<Photo> findByAlbumId(String albumId);
     List<Photo> findByUserIdAndTagsContaining(String userId, String tag);
+
+    List<Photo> findByUserIdAndTagsContainingIgnoreCase(String userId, String tag);
+    List<Photo> findByTagsContainingIgnoreCase(String tag);
 }

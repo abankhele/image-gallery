@@ -95,4 +95,17 @@ public class PhotoController {
         photoService.deletePhoto(photoId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Photo>> searchPhotos(
+            @RequestParam String query,
+            @RequestParam(required = false) String userId) {
+        List<Photo> photos;
+        if (userId != null) {
+            photos = photoService.searchPhotosByUserIdAndTags(userId, query);
+        } else {
+            photos = photoService.searchPhotosByTags(query);
+        }
+        return ResponseEntity.ok(photos);
+    }
 }
